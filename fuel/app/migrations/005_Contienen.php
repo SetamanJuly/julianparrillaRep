@@ -9,6 +9,7 @@ class Contienen
     {
         \DBUtil::create_table('contiene', 
             array(
+            'createdAt' => array('type' => 'int', 'null' => false),
             'id_lista' => array('type' => 'int', 'null' => false),
             'id_cancion' => array('type' => 'int', 'null' => false),
             ), 

@@ -72,6 +72,15 @@ class Controller_Base extends Controller_Rest
         } 
     }
 
+    protected function decodeToken(){
+        $header = apache_request_headers();
+        $token = $header['Authorization'];
+        if(!empty($token))
+        {
+            return $this->decode($token);
+        }      
+    }
+
     public function post_firstConfig(){
         $checkDataBase = Model_Users::find('all');
         if ($checkDataBase == null){

@@ -141,39 +141,60 @@ class Controller_Canciones extends Controller_Base
 
     public function get_playOneSong()
     {
-    	if ( ! isset($_GET['id'])) 
-        {
-            $json = $this->response(array(
-                'code' => 400,
-                'message' => 'parametro incorrecto, se necesita que el parametro id valido',
-                'data' => null
-            ));
+    	$tokenDecoded = self::checkToken();
+    	if ($tokenDecoded != null){
+	    	if ( ! isset($_GET['id'])) 
+	        {
+	            $json = $this->response(array(
+	                'code' => 400,
+	                'message' => 'parametro incorrecto, se necesita que el parametro id valido',
+	                'data' => null
+	            ));
 
-            return $json;
-        }else{
-	        $song = Model_Cancion::find($_GET['id']);
-	        if(empty($song)){
-	        	$json = $this->response(array(
-		            'code' => 400,
-		            'message' => 'Canción solicitada no existe',
-		            'data' => null
-		        ));
-
-		        return $json; 
+	            return $json;
 	        }else{
-	        	$sumador = $song->playsCount + 1;
-		        $song->playsCount = $sumador;
-		        $song->save();
+		        $song = Model_Cancion::find($_GET['id']);
+		        if(empty($song)){
+		        	$json = $this->response(array(
+			            'code' => 400,
+			            'message' => 'Canción solicitada no existe',
+			            'data' => null
+			        ));
 
-		        $json = $this->response(array(
-		            'code' => 200,
-		            'message' => 'Mostrando cancion solicitada',
-		            'data' => $song
-		        ));
+			        return $json; 
+		        }else{
+		        	$sumador = $song->playsCount + 1;
+			        $song->playsCount = $sumador;
+			        $song->save();
 
-		        return $json;  
-	    	}
-	    }
+			        $listToAdd = Model_List::find('all', ['where' => ['id_user' =>$tokenDecoded, 'systemList' => 1]]);
+			        $songToAdd = Model_Cancion::find('all', ['where' => ['id' =>$_GET['id']]]);
+			        $dataList = Arr::reindex($listToAdd);
+			        $songList = Arr::reindex($songToAdd);
+
+			        $add = new Model_Contiene();
+            		$add->id_cancion = $songList[0]->id;
+            		$add->id_lista = $dataList[0]->id;
+            		$add->createdAt = time();
+            		$add->save();
+
+			        $json = $this->response(array(
+			            'code' => 200,
+			            'message' => 'Mostrando cancion solicitada',
+			            'data' => $song
+			        ));
+
+			        return $json;  
+		    	}
+		    }
+		}else{
+			$json = $this->response(array(
+			            'code' => 200,
+			            'message' => 'Autenticacion fallida',
+			            'data' => $song
+			        ));
+			return $json; 
+		}
     }
 
     public function get_songs(){

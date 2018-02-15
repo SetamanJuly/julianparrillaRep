@@ -10,6 +10,9 @@ class Model_Contiene extends Orm\Model
         ),
         'id_lista' => array(
             'data_type' => 'int'   
+        ),
+        'createdAt' => array(
+            'data_type' => 'int'   
         )
     ); 
 }

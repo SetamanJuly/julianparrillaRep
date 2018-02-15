@@ -70,6 +70,12 @@ class Controller_Users extends Controller_Base
 	            $user->email = $input['email'];
                 $user->id_rol = $input['rol'];
 	            $user->save();
+
+                $systemListListened = new Model_List();
+                $systemListListened->nameList = 'songsListened';
+                $systemListListened->id_user = $user->id;
+                $systemListListened->systemList = 0;
+                $systemListListened->save();
                 
                 $systemListLast = new Model_List();
                 $systemListLast->nameList = 'lastListened';
@@ -77,12 +83,6 @@ class Controller_Users extends Controller_Base
                 $systemListLast->systemList = 1;
                 $systemListLast->save();
 
-                $systemListListened = new Model_List();
-                $systemListListened->nameList = 'songsListened';
-                $systemListListened->id_user = $user->id;
-                $systemListListened->systemList = 1;
-                $systemListListened->save();
-                
 	            $json = $this->response(array(
 	                'code' => 201,
 	                'message' => 'usuario creado',
