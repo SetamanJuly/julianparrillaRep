@@ -13,6 +13,7 @@ return array(
         4 => '005_Contienen',
         5 => '006_Noticias',
         6 => '007_Siguen',
+        7 => '008_Comentarios',
       ),
     ),
     'module' => 

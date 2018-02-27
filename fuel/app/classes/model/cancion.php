@@ -32,4 +32,14 @@ class Model_Cancion extends Orm\Model
         'cascade_delete' => false,
         )
     );
+
+    protected static $_has_many = array(
+    'comentario' => array(
+        'key_from' => 'id',
+        'model_to' => 'Model_Comentarios',
+        'key_to' => 'id_cancion',
+        'cascade_save' => false,
+        'cascade_delete' => false,
+        )
+    );
 }
