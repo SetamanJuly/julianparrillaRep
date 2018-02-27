@@ -9,22 +9,22 @@ class Users
         \DBUtil::create_table('users', 
             array(
             'id' => array('constraint' => 11, 'type' => 'int', 'auto_increment' => true),
-            'name' => array('type' => 'text', 'null' => true),
-            'email' => array('type' => 'text', 'null' => true),
-            'id_device' => array('type' => 'text'),
+            'name' => array('type' => 'text', 'null' => false),
+            'email' => array('type' => 'text', 'null' => false),
+            'id_device' => array('type' => 'text', 'null' => true),
             'profilePic' => array('type' => 'text', 'null' => true),
-            'pass' => array('type' => 'text', 'null' => true),
-            'descripcion' => array('type' => 'text'),
-            'birthdate' => array('type' => 'int'),
-            'x' => array('type' => 'int'),
-            'y' => array('type' => 'int'),
-            'ciudad' => array('type' => 'text'),
-            'id_rol' => array('type' => 'int', 'null' => true)
+            'pass' => array('type' => 'text', 'null' => false),
+            'descripcion' => array('type' => 'text', 'null' => true),
+            'birthdate' => array('type' => 'int', 'null' => true),
+            'x' => array('type' => 'int', 'null' => true),
+            'y' => array('type' => 'int', 'null' => true),
+            'ciudad' => array('type' => 'text', 'null' => true),
+            'id_rol' => array('type' => 'int', 'null' => false)
             ), 
             array('id'), false, 'InnoDB', 'utf8_general_ci',
             array(
                 array(
-                    'constraint' => 'foreignkeyUsuariosARoles',
+                    'constraint' => 'foreignkeyUsuariosARoless',
                     'key' => 'id_rol',
                     'reference' => array(
                         'table' => 'roles',

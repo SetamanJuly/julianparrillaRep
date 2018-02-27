@@ -73,41 +73,60 @@ class Controller_Base extends Controller_Rest
     }
 
     protected function decodeToken(){
-        $header = apache_request_headers();
-        $token = $header['Authorization'];
-        if(!empty($token))
+        try {
+            $header = apache_request_headers();
+            $token = $header['Authorization'];
+            if(!empty($token))
+            {
+                return $this->decode($token);
+            }   
+        } 
+        catch (Exception $e) 
         {
-            return $this->decode($token);
-        }      
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+                'data' => null
+            ));
+
+            return $json;
+        }    
     }
 
     public function post_firstConfig(){
-        $checkDataBase = Model_Users::find('all');
-        if ($checkDataBase == null){
-            $rol = new Model_Roles();
-            $rol->descripcion = "administrator";
-            $rol->save();
-            $user = new Model_Users();
-            $user->name = "admin";
-            $user->pass = "1234";
-            $user->email = "admin@admin.es";
-            $user->id_rol = "1";
-            $user->save();
-            $configDone = true;
+        
+            $checkDataBase = Model_Users::find('all');
+            if ($checkDataBase == null){
+                $rol = new Model_Roles();
+                $rol->descripcion = "administrator";
+                $rol->save();
 
-            $json = $this->response(array(
-                'code' => 200,
-                'message' => 'Primera configuración finalizada',
-                'data' => null
-            ));
-            return $json;
-        }else{
-            $json = $this->response(array(
-                'code' => 400,
-                'message' => 'No es necesario hacer la primera configuración',
-                'data' => null
-            ));
-            return $json;
-        }
+                $rolGuest = new Model_Roles();
+                $rolGuest->descripcion = "guest";
+                $rolGuest->save();
+
+                $user = new Model_Users();
+                $user->name = "admin";
+                $user->pass = "1234";
+                $user->email = "admin@admin.es";
+                $user->id_rol = "1";
+                $user->save();
+                $configDone = true;
+
+                $json = $this->response(array(
+                    'code' => 200,
+                    'message' => 'Primera configuración finalizada',
+                    'data' => null
+                ));
+                return $json;
+            }else{
+                $json = $this->response(array(
+                    'code' => 400,
+                    'message' => 'No es necesario hacer la primera configuración',
+                    'data' => null
+                ));
+                return $json;
+            }
+        
     }
 }

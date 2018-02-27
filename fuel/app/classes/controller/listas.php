@@ -38,7 +38,8 @@ class Controller_Listas extends Controller_Base
         {
             $json = $this->response(array(
                 'code' => 500,
-                'message' => 'error interno del servidor',
+                'message' => 'error interno del servidor - error en token',
+                'data' => null
             ));
 
             return $json;
@@ -47,7 +48,7 @@ class Controller_Listas extends Controller_Base
 
     public function post_modify()
     {
-        //try {
+        try {
             if ( ! isset($_POST['nameList'])) 
             {
                 $json = $this->response(array(
@@ -79,19 +80,68 @@ class Controller_Listas extends Controller_Base
                 'name' => $song->nameList
             ));
 
-            return $json;      
+            return $json;   
+        } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+                'data' => null
+            ));
+
+            return $json;
+        }    
     }
 
     public function get_lists()
     {
-        $idUser = self::checkToken();
-        $list = Model_List::find('all', ['where' => ['id_user' =>$idUser, 'systemList' => 2]]);
+    	try{
+	        $idUser = self::checkToken();
+	        $list = Model_List::find('all', ['where' => ['id_user' =>$idUser, 'systemList' => 2]]);
 
-        $json = $this->response(array(
-            $list,
-        ));
+	        $json = $this->response(array(
+	            $list,
+	        ));
 
-        return $json;  
+	        return $json;  
+	    } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor - error en token',
+                'data' => null
+            ));
+
+            return $json;
+        }
+    }
+
+    public function get_listsAll()
+    {
+    	try{
+	        $idUser = self::checkToken();
+	        $list = Model_List::find('all');
+
+	        $json = $this->response(array(
+	            'code' => 200,
+                'message' => 'Mostrando todas las listas existentes',
+                'data' => $list
+	        ));
+
+	        return $json;  
+	    } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor - error en token',
+                'data' => null
+            ));
+
+            return $json;
+        }
     }
 
     public function post_delete()

@@ -17,6 +17,27 @@ class Model_Users extends Orm\Model
         ),
         'id_rol' => array(
             'data_type' => 'int'   
+        ),
+        'id_device' => array(
+            'data_type' => 'varchar'   
+        ),
+        'profilePic' => array(
+            'data_type' => 'varchar'   
+        ),
+        'descripcion' => array(
+            'data_type' => 'varchar'   
+        ),
+        'birthdate' => array(
+            'data_type' => 'varchar'   
+        ),
+        'x' => array(
+            'data_type' => 'int'   
+        ),
+        'y' => array(
+            'data_type' => 'int'   
+        ),
+        'ciudad' => array(
+            'data_type' => 'varchar'   
         )
     );
 
@@ -25,7 +46,7 @@ class Model_Users extends Orm\Model
         'key_from' => 'id_rol',
         'model_to' => 'Model_Roles',
         'key_to' => 'id',
-        'cascade_save' => true,
+        'cascade_save' => false,
         'cascade_delete' => false,
         )
     );
@@ -35,7 +56,7 @@ class Model_Users extends Orm\Model
         'key_from' => 'id',
         'model_to' => 'Model_List',
         'key_to' => 'id_user',
-        'cascade_save' => true,
+        'cascade_save' => false,
         'cascade_delete' => false,
     	),
     'noticia' => array(
@@ -66,7 +87,7 @@ class Model_Users extends Orm\Model
         'model_to' => 'Model_Siguen',
         'key_to' => 'id',
         'cascade_save' => false,
-        'cascade_delete' => false,
+        'cascade_delete' => true,
         )
     );
 }

@@ -92,7 +92,7 @@ class Controller_Users extends Controller_Base
 	            return $json;
             }else{
             	$json = $this->response(array(
-	                'code' => 204,
+	                'code' => 401,
 	                'message' => 'el usuario ya existe',
                     'data' => null
 	            ));
@@ -114,30 +114,42 @@ class Controller_Users extends Controller_Base
 
     public function post_modify()
     {
-            if ( ! isset($_POST['pass'])) 
-            {
-                $json = $this->response(array(
-                    'code' => 400,
-                    'message' => 'parametro incorrecto, se necesita que el parametro se llame pass',
-                    'data' => null
-                ));
+    	try {
+	        if ( ! isset($_POST['pass'])) 
+	        {
+	            $json = $this->response(array(
+	                'code' => 400,
+	                'message' => 'parametro incorrecto, se necesita que el parametro se llame pass',
+	                'data' => null
+	            ));
 
-                return $json;
-            }
+	            return $json;
+	        }
 
-            $input = $_POST;
-            $idUser = self::checkToken();
-            $user = Model_Users::find($idUser);
-            $user->pass = $_POST['pass'];
-            $user->save();
+	        $input = $_POST;
+	        $idUser = self::checkToken();
+	        $user = Model_Users::find($idUser);
+	        $user->pass = $_POST['pass'];
+	        $user->save();
 
+	        $json = $this->response(array(
+	            'code' => 200,
+	            'message' => 'contraseña modificada',
+	            'data' => $user
+	        ));
+
+	        return $json;   
+	    }
+	    catch (Exception $e) 
+        {
             $json = $this->response(array(
-                'code' => 200,
-                'message' => 'contraseña modificada',
-                'data' => $user
+                'code' => 500,
+                'message' => 'error interno del servidor',
+                'data' => null
             ));
 
-            return $json;      
+            return $json;
+        }      
     }
 
     public function get_login()
@@ -201,51 +213,90 @@ class Controller_Users extends Controller_Base
 
     public function get_users()
     {
-        $users = Model_Users::find('all', ['select' => 'name']);
+    	try{
+	        $users = Model_Users::find('all', ['select' => 'name']);
 
-        foreach ($users as $key => $value) {
-                $show[] = $value->name;
-                $showID[] = $value->id;
-        }
-        $json = $this->response(array(
-            'name' => $show,
-            'id' => $showID
-        ));
+	        foreach ($users as $key => $value) {
+	                $show[] = $value->name;
+	                $showID[] = $value->id;
+	        }
+	        $json = $this->response(array(
+	            'name' => $show,
+	            'id' => $showID
+	        ));
 
-        return $json;  
+	        return $json; 
+        } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+            ));
+
+            return $json;
+        }  
     }
 
     public function get_singleuser()
     {
-        $users = Model_Users::find('all', ['where' => ['id' => $_GET['id']]]);
+    	try{
+	    	if ( ! isset($_GET['id'])) 
+	        {
+	            $json = $this->response(array(
+	                'code' => 400,
+	                'message' => 'parametro incorrecto, se necesita que el parametro se id',
+	                'data' => null
+	            ));
 
-        foreach ($users as $key => $value) {
-                $show[] = $value->name;
-                $showP[] = $value->pass;
-        }
+	            return $json;
+	        }
 
-        $json = $this->response(array(
-            'name' => $show,
-            'pass' => $showP,
-            'data' => null
-        ));
+	        $users = Model_Users::find('all', ['where' => ['id' => $_GET['id']]]);
 
-        return $json;  
+	        $json = $this->response(array(
+	            'code' => 200,
+	            'message' => 'Mostrando usuario solicitado',
+	            'data' => $users
+	        ));
+
+	        return $json;
+	    } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+            ));
+
+            return $json;
+        }  
     }
 
     public function post_delete()
     {
-    	$idABorrar = self::checkToken();
-        $user = Model_Users::find($idABorrar);
-        $userName = $user->name;
-        $user->delete();
+        try{
+        	$idABorrar = self::checkToken();
+            $user = Model_Users::find($idABorrar);
+            $userName = $user->name;
+            $user->delete();
 
-        $json = $this->response(array(
-            'code' => 200,
-            'message' => 'usuario borrado',
-            'data' => $userName
-        ));
+            $json = $this->response(array(
+                'code' => 200,
+                'message' => 'usuario borrado',
+                'data' => $userName
+            ));
 
-        return $json;
+            return $json;
+        } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+            ));
+
+            return $json;
+        }
     }
 }

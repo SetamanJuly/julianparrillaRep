@@ -68,7 +68,7 @@ class Controller_Canciones extends Controller_Base
                 return $json;
             }else{
                 $json = $this->response(array(
-                    'code' => 204,
+                    'code' => 401,
                     'message' => 'La cancion ya existe',
                     'data' => null
                 ));
@@ -91,110 +91,140 @@ class Controller_Canciones extends Controller_Base
 
     public function post_modify()
     {
-        if ( ! isset($_POST['nameSong'])) 
-        {
-            $json = $this->response(array(
-                'code' => 400,
-                'message' => 'parametro incorrecto, se necesita que el parametro se llame name',
-                'data' => null
-            ));
-
-            return $json;
-        }
-
-        if ( ! isset($_POST['urlSong'])) 
-        {
-            $json = $this->response(array(
-                'code' => 400,
-                'message' => 'parametro incorrecto, se necesita que el parametro url',
-                'data' => null
-            ));
-
-            return $json;
-        }
-
-        if ( ! isset($_POST['idsong'])) 
-        {
-            $json = $this->response(array(
-                'code' => 400,
-                'message' => 'parametro incorrecto, se necesita que el parametro id',
-                'data' => null
-            ));
-
-            return $json;
-        }
-
-        $input = $_POST;
-        $song = Model_Cancion::find($input['idsong']);
-        $song->nameSong = $input['nameSong'];
-        $song->urlSong = $input['urlSong'];
-        $song->save();
-
-        $json = $this->response(array(
-            'code' => 200,
-            'message' => 'cancion modificada',
-            'data' => $song->nameSong
-        ));
-
-        return $json;      
-    }
-
-    public function get_playOneSong()
-    {
-    	$tokenDecoded = self::checkToken();
-    	if ($tokenDecoded != null){
-	    	if ( ! isset($_GET['id'])) 
+    	try{
+	        if ( ! isset($_POST['nameSong'])) 
 	        {
 	            $json = $this->response(array(
 	                'code' => 400,
-	                'message' => 'parametro incorrecto, se necesita que el parametro id valido',
+	                'message' => 'parametro incorrecto, se necesita que el parametro se llame name',
 	                'data' => null
 	            ));
 
 	            return $json;
-	        }else{
-		        $song = Model_Cancion::find($_GET['id']);
-		        if(empty($song)){
-		        	$json = $this->response(array(
-			            'code' => 400,
-			            'message' => 'Canción solicitada no existe',
-			            'data' => null
-			        ));
+	        }
 
-			        return $json; 
+	        if ( ! isset($_POST['urlSong'])) 
+	        {
+	            $json = $this->response(array(
+	                'code' => 400,
+	                'message' => 'parametro incorrecto, se necesita que el parametro url',
+	                'data' => null
+	            ));
+
+	            return $json;
+	        }
+
+	        if ( ! isset($_POST['idsong'])) 
+	        {
+	            $json = $this->response(array(
+	                'code' => 400,
+	                'message' => 'parametro incorrecto, se necesita que el parametro id',
+	                'data' => null
+	            ));
+
+	            return $json;
+	        }
+
+	        $input = $_POST;
+	        $song = Model_Cancion::find($input['idsong']);
+	        $song->nameSong = $input['nameSong'];
+	        $song->urlSong = $input['urlSong'];
+	        $song->save();
+
+	        $json = $this->response(array(
+	            'code' => 200,
+	            'message' => 'cancion modificada',
+	            'data' => $song->nameSong
+	        ));
+
+	        return $json; 
+	    } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+                'data' => null
+            ));
+
+            return $json;
+        }     
+    }
+
+    public function get_playOneSong()
+    {
+    	try{
+    	   	$tokenDecoded = self::checkToken();
+	    	if ($tokenDecoded != null){
+		    	if ( ! isset($_GET['id'])) 
+		        {
+		            $json = $this->response(array(
+		                'code' => 400,
+		                'message' => 'parametro incorrecto, se necesita que el parametro id valido',
+		                'data' => null
+		            ));
+
+		            return $json;
 		        }else{
-		        	$sumador = $song->playsCount + 1;
-			        $song->playsCount = $sumador;
-			        $song->save();
+			        $song = Model_Cancion::find($_GET['id']);
+			        if(empty($song)){
+			        	$json = $this->response(array(
+				            'code' => 400,
+				            'message' => 'Canción solicitada no existe',
+				            'data' => null
+				        ));
 
-			        $listToAdd = Model_List::find('all', ['where' => ['id_user' =>$tokenDecoded, 'systemList' => 1]]);
-			        $songToAdd = Model_Cancion::find('all', ['where' => ['id' =>$_GET['id']]]);
-			        $dataList = Arr::reindex($listToAdd);
-			        $songList = Arr::reindex($songToAdd);
+				        return $json; 
+			        }else{
+			        	$sumador = $song->playsCount + 1;
+				        $song->playsCount = $sumador;
+				        $song->save();
 
-			        $add = new Model_Contiene();
-            		$add->id_cancion = $songList[0]->id;
-            		$add->id_lista = $dataList[0]->id;
-            		$add->createdAt = time();
-            		$add->save();
+				        $listToAdd = Model_List::find('all', ['where' => ['id_user' =>$tokenDecoded, 'systemList' => 1]]);
+				        $songToAdd = Model_Cancion::find('all', ['where' => ['id' =>$_GET['id']]]);
+				        $dataList = Arr::reindex($listToAdd);
+				        $songList = Arr::reindex($songToAdd);
 
-			        $json = $this->response(array(
-			            'code' => 200,
-			            'message' => 'Mostrando cancion solicitada',
-			            'data' => $song
-			        ));
+						$checkIfExist = Model_Contiene::find([$songList[0]->id, $dataList[0]->id]);
 
-			        return $json;  
-		    	}
-		    }
-		}else{
-			$json = $this->response(array(
-			            'code' => 200,
-			            'message' => 'Autenticacion fallida',
-			            'data' => $song
-			        ));
-			return $json; 
+						if ($checkIfExist != null){
+					    	$checkIfExist->delete();
+					    }
+
+						$add = new Model_Contiene();
+	            		$add->id_cancion = $songList[0]->id;
+	            		$add->id_lista = $dataList[0]->id;
+	            		$add->createdAt = time();
+	            		$add->save();
+
+				        $json = $this->response(array(
+				            'code' => 200,
+				            'message' => 'Mostrando cancion solicitada',
+				            'data' => $checkIfExist
+				        ));
+
+				        return $json;  
+			    	}
+			    }
+			}else{
+				$json = $this->response(array(
+				            'code' => 200,
+				            'message' => 'Autenticacion fallida',
+				            'data' => $song
+				        ));
+				return $json; 
+			}
 		}
+		catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+                'data' => null
+            ));
+
+            return $json;
+        }  
     }
 
     public function get_songs(){
@@ -203,7 +233,7 @@ class Controller_Canciones extends Controller_Base
         $json = $this->response(array(
             'code' => 200,
             'message' => 'mostrando todas las canciones',
-            'data' => $song
+            'data' => arr::reindex($song)
         ));
 
         return $json; 
@@ -211,16 +241,39 @@ class Controller_Canciones extends Controller_Base
 
     public function post_delete()
     {
-        $song = Model_Cancion::find($_POST['id']);
-        $song->delete();
+    	try{
+	    	if ( ! isset($_POST['id'])) 
+		        {
+	            $json = $this->response(array(
+	                'code' => 400,
+	                'message' => 'parametro incorrecto, se necesita que el parametro id valido',
+	                'data' => null
+	            ));
 
-        $json = $this->response(array(
-            'code' => 200,
-            'message' => 'cancion borrado',
-            'name' => $song
-        ));
+	            return $json;
+	        }else{
+			    $song = Model_Cancion::find($_POST['id']);
+			    $song->delete();
 
-        return $json;
+			    $json = $this->response(array(
+			        'code' => 200,
+			        'message' => 'cancion borrado',
+			        'name' => $song
+			    ));
+
+			    return $json;
+			}
+		}
+		catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+                'data' => null
+            ));
+
+            return $json;
+        } 
     }
 
     public function get_views()

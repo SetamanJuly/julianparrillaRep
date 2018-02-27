@@ -30,6 +30,7 @@ class Controller_Contienen extends Controller_Base
             $add = new Model_Contiene();
             $add->id_cancion = $input['idCancion'];
             $add->id_lista = $input['idLista'];
+            $add->createdAt = time();
             $add->save();
 
             $json = $this->response(array(
@@ -39,7 +40,6 @@ class Controller_Contienen extends Controller_Base
             ));
 
             return $json;
-
         } 
         catch (Exception $e) 
         {
@@ -115,19 +115,5 @@ class Controller_Contienen extends Controller_Base
 
 	        return $json;  
      
-    }
-
-    public function post_delete()
-    {
-        $song = Model_Cancion::find($_POST['id']);
-        $song->delete();
-
-        $json = $this->response(array(
-            'code' => 200,
-            'message' => 'cancion borrado',
-            'name' => $song
-        ));
-
-        return $json;
     }
 }
