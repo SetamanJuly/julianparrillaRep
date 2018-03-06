@@ -205,6 +205,7 @@ class Controller_Users extends Controller_Base
             $json = $this->response(array(
                 'code' => 500,
                 'message' => 'error interno del servidor',
+                'data' => null
             ));
 
             return $json;
@@ -254,7 +255,7 @@ class Controller_Users extends Controller_Base
                 $json = $this->response(array(
                     'code' => 201,
                     'message' => 'Logeado',
-                    'token' => $token           
+                    'data' => ['token'=>$token]           
                 ));
                 return $json;  
             }
@@ -264,6 +265,7 @@ class Controller_Users extends Controller_Base
             $json = $this->response(array(
                 'code' => 500,
                 'message' => 'error interno del servidor',
+                'data' => null
             ));
 
             return $json;
