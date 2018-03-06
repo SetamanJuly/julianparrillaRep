@@ -195,7 +195,7 @@ class Controller_Users extends Controller_Base
                 $json = $this->response(array(
                     'code' => 201,
                     'message' => 'Logeado',
-                    'token' => $token           
+                    'data' => ["token" => $token]           
                 ));
                 return $json;  
             }
