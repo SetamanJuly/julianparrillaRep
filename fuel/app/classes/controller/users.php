@@ -211,6 +211,66 @@ class Controller_Users extends Controller_Base
         }                       
     }
 
+    public function get_recoverPass()
+    {
+        try {
+            if ( ! isset($_GET['email'])) 
+            {
+                $json = $this->response(array(
+                    'code' => 400,
+                    'message' => 'parametro incorrecto, se necesita que el parametro email',
+                    'data' => null
+                ));
+
+                return $json;
+            }
+
+            if ( ! isset($_GET['name'])) 
+            {
+                $json = $this->response(array(
+                    'code' => 400,
+                    'message' => 'parametro incorrecto, se necesita que el parametro se llame name',
+                    'data' => null
+                ));
+
+                return $json;
+            }
+
+            $users = Model_Users::find('all', ['where' => ['email' => $_GET['email'], 'name' => $_GET['name']]]);
+
+            foreach ($users as $key => $value) {
+                $id = $value->id;
+            }
+
+            if ($users == null){
+                $json = $this->response(array(
+                    'code' => 401,
+                    'message' => 'usuario o email incorrecto',
+                    'data' => null
+                ));
+                return $json;
+            }else{
+                $token = self::createToken($_GET['name'],"NotDefined",$id);
+                $json = $this->response(array(
+                    'code' => 201,
+                    'message' => 'Logeado',
+                    'token' => $token           
+                ));
+                return $json;  
+            }
+        } 
+        catch (Exception $e) 
+        {
+            $json = $this->response(array(
+                'code' => 500,
+                'message' => 'error interno del servidor',
+            ));
+
+            return $json;
+        }                       
+    }
+
+
     public function get_users()
     {
     	try{
