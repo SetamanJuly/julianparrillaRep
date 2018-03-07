@@ -233,7 +233,7 @@ class Controller_Canciones extends Controller_Base
         $json = $this->response(array(
             'code' => 200,
             'message' => 'mostrando todas las canciones',
-            'data' => arr::reindex($song)
+            'data' => ["songs" => arr::reindex($song)]
         ));
 
         return $json; 
